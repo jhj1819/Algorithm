@@ -1,5 +1,4 @@
 import sys
-from collections import deque
 
 input = sys.stdin.readline
 
@@ -16,7 +15,7 @@ for _ in range(m):
         adj_list[numbers[i]].append(numbers[i+1])
         in_dict[numbers[i+1]] += 1
 
-queue = deque()
+queue = []
 for i in range(1, n + 1):
     if in_dict[i] == 0:
         in_dict[i] -= 1  # 음수로 바꿔서 ==0 에 안걸리게
@@ -24,7 +23,7 @@ for i in range(1, n + 1):
 
 answer = []
 while queue:
-    node = queue.popleft()
+    node = queue.pop()
     answer.append(node)
     for adj_node in adj_list[node]:
         in_dict[adj_node] -= 1

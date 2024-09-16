@@ -1,0 +1,7 @@
+n = int(input())
+items = list(map(int, input().split()))
+threshold, divisor = map(int, input().split())
+total_bundles = sum((item + threshold - 1) // threshold for item in items if item > 0)
+quotient, remainder = divmod(n, divisor)
+print(total_bundles)
+print(quotient, remainder)

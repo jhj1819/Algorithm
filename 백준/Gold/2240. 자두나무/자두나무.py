@@ -1,39 +1,30 @@
+import sys
+
+input = sys.stdin.readline
+
 T, W = map(int, input().split())
-apples = [int(input()) for _ in range(T)]
 
-# DP 테이블 초기화: prev_dp[w][pos], pos는 0(1번 나무) 또는 1(2번 나무)
-prev_dp = [[-float('inf')] * 2 for _ in range(W + 1)]
-prev_dp[0][0] = 0  # 시작 위치는 1번 나무(인덱스 0), 이동 0회
+fruit_pos = []
+for _ in range(T):
+    fruit_pos.append(int(input()))
 
-for a in apples:
-    curr_dp = [[-float('inf')] * 2 for _ in range(W + 1)]
-    a_idx = a - 1  # 나무 번호를 0 또는 1로 변환
+dp = [[[0 for _ in range(W + 1)] for _ in range(3)] for _ in range(T)]
+# dp[i][j][k]: i: 초 j: 현재위치 k: 이동횟수
+for i in range(T):
+    gain_1 = 1 if fruit_pos[i] == 1 else 0
+    gain_2 = 1 if fruit_pos[i] == 2 else 0
+    for j in range(W + 1):
+        if i == 0:
+            dp[i][2][1] = gain_2
+            dp[i][1][0] = gain_1
+            continue
+        if j == 0:
+            dp[i][1][0] = dp[i-1][1][0] + gain_1
+            continue
+        dp[i][1][j] = max(dp[i - 1][1][j], dp[i - 1][2][j - 1]) + gain_1
+        dp[i][2][j] = max(dp[i - 1][2][j], dp[i - 1][1][j - 1]) + gain_2
+        # j가 0 일때 이경우는 선택되지 않을거라 생각했는데 아니었음
+        # j 가 너무 길어지지 않도록 끊어줄 필요도 있겠다
 
-    for w in range(W + 1):
-        for pos in [0, 1]:
-            if prev_dp[w][pos] == -float('inf'):
-                continue
 
-            # 이동하지 않는 경우
-            new_w = w
-            new_pos = pos
-            gain = 1 if (new_pos == a_idx) else 0
-            curr_dp[new_w][new_pos] = max(curr_dp[new_w][new_pos], prev_dp[w][pos] + gain)
-
-            # 이동하는 경우
-            new_w = w + 1
-            if new_w > W:
-                continue
-            new_pos = 1 - pos  # 위치 변경
-            gain = 1 if (new_pos == a_idx) else 0
-            curr_dp[new_w][new_pos] = max(curr_dp[new_w][new_pos], prev_dp[w][pos] + gain)
-
-    prev_dp = curr_dp
-
-# 모든 가능한 경우 중 최대값 찾기
-max_count = 0
-for w in range(W + 1):
-    for pos in [0, 1]:
-        max_count = max(max_count, prev_dp[w][pos])
-
-print(max_count)
+print(max(max(dp[T - 1][1]), max(dp[T - 1][2])))
